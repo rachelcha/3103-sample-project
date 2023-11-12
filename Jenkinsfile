@@ -24,7 +24,7 @@ pipeline {
                         withSonarQubeEnv('SonarQube') {
                             sh """
                                 ${scannerHome}/bin/sonar-scanner \
-                                -Dsonar.projectKey=OWASP \
+                                -Dsonar.projectKey=3103-sample-project \
                                 -Dsonar.sources=. \
                                 -Dsonar.host.url=http:172.18.0.3:9000 \
                                 -Dsonar.token=sqp_107d7d87eb3eb3711f233e07a7713ab2fee6abe6

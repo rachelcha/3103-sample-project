@@ -21,7 +21,7 @@ pipeline {
             steps {
                 sh '''
                     npm install 
-                    npm run test 
+                    npm test 
                 '''
             }
         }

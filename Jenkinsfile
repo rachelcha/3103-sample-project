@@ -21,7 +21,7 @@ pipeline {
             steps {
                 sh '''
                     npm install 
-                    npm test 
+                    node seleniumTest.js 
                 '''
             }
         }

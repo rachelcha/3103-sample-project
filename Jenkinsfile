@@ -17,6 +17,14 @@ pipeline {
                 dependencyCheckPublisher pattern: 'dependency-check-report.xml'
             }
 		}
+        stage('UI Testing') {
+            steps {
+                sh '''
+                    npm install 
+                    npm run test 
+                '''
+            }
+        }
         stage('SonarQube Analysis') {
                 steps {
                     script {

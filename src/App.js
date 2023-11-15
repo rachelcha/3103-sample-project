@@ -1,72 +1,96 @@
-import React, { useState, useEffect } from 'react';
-import './App.css';
+import { useState } from "react";
+import { Row, Col, Button, Container, Form } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import DOMPurify from "dompurify";
 
 function App() {
-  const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-  const [commonPasswords, setCommonPasswords] = useState([]);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+    let navigate = useNavigate();
+    const [searchValue, setSearchValue] = useState("");
+    const [password, setPassword] = useState("");
 
-  useEffect(() => {
-    fetch('https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/Common-Credentials/10-million-password-list-top-1000.txt')
-      .then(response => response.text())
-      .then(data => setCommonPasswords(data.split('\n')))
-      .catch(error => console.error('Error fetching common passwords:', error));
-  }, []);
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        const sanitisedInput = DOMPurify.sanitize(searchValue);
+        if (sanitisedInput !== searchValue) {
+            setSearchValue("");
+        } else {
+            navigate("/test");
+        }
+    };
 
-  const handleLogin = () => {
-    const isValidPassword = validatePassword(password);
+    const handleSubmit2 = (event) => {
+        event.preventDefault();
+        checkPassword();
+    };
 
-    if (isValidPassword) {
-      setIsLoggedIn(true);
-      console.log('Logging in with password:', password);
-    } else {
-      setErrorMessage('Password does not meet requirements.');
-    }
-  };
+    const checkPassword = async () => {
+        const response = await fetch(`http://localhost:3000/login`, {
+            method: "POST",
+            body: JSON.stringify({
+                password: password,
+            }),
+            headers: {
+                "Content-type": "application/json; charset=UTF-8",
+            },
+        });
 
-  const validatePassword = (password) => {
-    const minLength = 10;
-    const isCommonPassword = commonPasswords.includes(password);
+        if (response.status == 200) {
+            navigate("/welcome", { state: { password: password } });
+        } else {
+            alert("Invalid password");
+        }
+    };
 
-    return password.length >= minLength && !isCommonPassword;
-  };
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setPassword('');
-    setErrorMessage('')
-  };
-
-  if (isLoggedIn) {
     return (
-      <div>
-        <header>
-          <p>Welcome! Password: {password}</p>
-          <button onClick={handleLogout}>Logout</button>
-        </header>
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      <header>
-        <p>Home Page</p>
         <div>
-          <label htmlFor="password">Password: </label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+            <Container>
+                <Row>
+                    <Col>
+                        <Form onSubmit={handleSubmit}>
+                            <Form.Group
+                                className="mb-3"
+                                controlId="ControlInput1"
+                            >
+                                <Form.Label></Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Search here"
+                                    value={searchValue}
+                                    onChange={(e) =>
+                                        setSearchValue(e.target.value)
+                                    }
+                                />
+                            </Form.Group>
+                            <Button variant="primary" type="submit">
+                                Search
+                            </Button>
+                        </Form>
+                    </Col>
+                    <Col>
+                        <Form onSubmit={handleSubmit2}>
+                            <Form.Group
+                                className="mb-3"
+                                controlId="ControlInput2"
+                            >
+                                <Form.Label></Form.Label>
+                                <Form.Control
+                                    type="password"
+                                    placeholder="Login"
+                                    value={password}
+                                    onChange={(e) =>
+                                        setPassword(e.target.value)
+                                    }
+                                />
+                            </Form.Group>
+                            <Button variant="primary" type="submit">
+                                Login
+                            </Button>
+                        </Form>
+                    </Col>
+                </Row>
+            </Container>
         </div>
-        <button onClick={handleLogin}>Login</button>
-        {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-      </header>
-    </div>
-  );
+    );
 }
 
 export default App;

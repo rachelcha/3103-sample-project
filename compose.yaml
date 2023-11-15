@@ -6,12 +6,23 @@ services:
       ports:
           - 3000:3000
           
-  selenium-hub:
-  image: selenium/hub:latest
-  ports:
-    - "4444:4444"
+  # selenium-hub:
+  # image: selenium/hub:latest
+  # ports:
+  #   - "4444:4444"
+
+  git-server:
+    build:
+      dockerfile: gitserver.Dockerfile
+      context: .
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./repos:/var/www/git
 
 chrome-node:
   image: selenium/node-chrome:latest
   depends_on:
     - selenium-hub
+
